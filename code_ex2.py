@@ -200,6 +200,7 @@ def run_problem_3():
 
 
 def hierarchical_clustering(data, type_of_data, save=False, show=True):
+    figures = list()
     for linkage in ("average", "complete", "single"):
         for k in [2, 3, 4, 5]:
             clustering = AgglomerativeClustering(linkage=linkage, n_clusters=k).fit_predict(data)
@@ -209,7 +210,8 @@ def hierarchical_clustering(data, type_of_data, save=False, show=True):
                 plt.savefig(f'clusters/{type_of_data}_cluster_k-{k}', bbox_inches='tight')
             if show:
                 plt.show()
-    # return f'clusters/{type_of_data}_cluster_k-{k}.png'
+            figures.append(f'clusters/{type_of_data}_cluster_k-{k}.png')
+    return figures
 
 
 
@@ -234,4 +236,4 @@ if __name__ == '__main__':
     # get_horizontal_clamps([(0,0) , (5,0), (0,2), (5,2)], 1, 0.25, 125)
     # get_moon_b([-1, 1], [0, 2])
     # print(run_problem_3())
-    # hierarchical_clustering(get_moon_b([-1, 1], [0, 2], False), 'moon')
+    hierarchical_clustering(get_moon_b([-1, 1], [0, 2], False), 'moon')
