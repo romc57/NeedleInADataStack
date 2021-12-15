@@ -3,6 +3,7 @@ import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
 
 
 MIN_RANGE = 0
@@ -198,6 +199,20 @@ def run_problem_3():
     return output_dic
 
 
+def hierarchical_clustering(data, type_of_data, save=False, show=True):
+    for linkage in ("average", "complete", "single"):
+        for k in [2, 3, 4, 5]:
+            clustering = AgglomerativeClustering(linkage=linkage, n_clusters=k).fit_predict(data)
+            plt.title(f'{type_of_data} hierarchical clustering, k = {k} ,algorithm = {linkage}')
+            plt.scatter(data[:, 0], data[:, 1], c=clustering)
+            if save:
+                plt.savefig(f'clusters/{type_of_data}_cluster_k-{k}', bbox_inches='tight')
+            if show:
+                plt.show()
+    # return f'clusters/{type_of_data}_cluster_k-{k}.png'
+
+
+
 def merge_x_y(x_data, y_data):
     data = list()
     for i in range(len(x_data)):
@@ -218,4 +233,5 @@ if __name__ == '__main__':
     # get_gaussian_data([1, 2, 4], 0.5, 500)
     # get_horizontal_clamps([(0,0) , (5,0), (0,2), (5,2)], 1, 0.25, 125)
     # get_moon_b([-1, 1], [0, 2])
-    print(run_problem_3())
+    # print(run_problem_3())
+    # hierarchical_clustering(get_moon_b([-1, 1], [0, 2], False), 'moon')
