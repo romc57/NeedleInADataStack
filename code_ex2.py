@@ -39,7 +39,7 @@ def get_moon_b(range_x_1, range_x_2):
     plt.scatter(data_x_1, data_y_1)
     plt.scatter(data_x_2, data_y_2)
     plt.ylim((-1.5, 2.2))
-    plt.xlim((-1.5,2.2))
+    plt.xlim((-1.5, 2.2))
     plt.show()
 
 
@@ -55,7 +55,46 @@ def get_moon_c(range_x_1, range_x_2):
     plt.scatter(data_x_1, data_y_1)
     plt.scatter(data_x_2, data_y_2)
     plt.ylim((-1.5, 2.5))
-    plt.xlim((-1.5,2.5))
+    plt.xlim((-1.5, 2.5))
+    plt.show()
+
+
+def get_letters_data():
+    # c plot:
+    data_x_1 = np.random.uniform(-2, 0, 250)
+    data_y_1 = 1 - (data_x_1 + 1) ** 2
+    data_y_1 = np.concatenate([np.sqrt(data_y_1), -np.sqrt(data_y_1)])
+    data_x_1 = np.concatenate([data_x_1, data_x_1])
+    data_y_1 = data_y_1[data_x_1 < -0.5]
+    data_y_1 += np.random.uniform(-0.1, 0.1, data_y_1.size)
+    data_x_1 = data_x_1[data_x_1 < - 0.5]
+    data_x_1 += np.random.uniform(-0.1, 0.1, data_x_1.size)
+    plt.scatter(data_x_1, data_y_1)
+    # s plot firs c:
+    data_x_2 = np.random.uniform(0, 2, 125)
+    data_y_2 = 1 - (data_x_2 - 1) ** 2
+    data_y_2 = np.concatenate([np.sqrt(data_y_2), -np.sqrt(data_y_2)]) * 0.5 + 0.5
+    data_x_2 = np.concatenate([data_x_2, data_x_2])
+    data_y_2 = data_y_2[data_x_2 < 1.5]
+    data_y_2 += np.random.uniform(-0.1, 0.1, data_y_2.size)
+    data_x_2 = data_x_2[data_x_2 < 1.5]
+    data_x_2 += np.random.uniform(-0.1, 0.1, data_x_2.size)
+    # s plot second c :
+    data_x_3 = np.random.uniform(0, 2, 125)
+    data_y_3 = 1 - (data_x_3 - 1) ** 2
+    data_y_3 = np.concatenate([np.sqrt(data_y_3), -np.sqrt(data_y_3)]) * 0.5 - 0.5
+    data_x_3 = np.concatenate([data_x_3, data_x_3])
+    data_y_3 = data_y_3[data_x_3 < 1.5]
+    data_y_3 += np.random.uniform(-0.1, 0.1, data_y_3.size)
+    data_x_3 = data_x_3[data_x_3 < 1.5]
+    data_x_3 += np.random.uniform(-0.1, 0.1, data_x_3.size)
+    data_x_3 = data_x_3 * -1 + 1.9
+    data_x_2 = np.concatenate([data_x_2, data_x_3])
+    data_y_2 = np.concatenate([data_y_2, data_y_3])
+    # plot
+    plt.scatter(data_x_2, data_y_2)
+    plt.ylim((-3, 3))
+    plt.xlim((-3, 3))
     plt.show()
 
 
@@ -82,10 +121,5 @@ if __name__ == '__main__':
     # plot_data(x, y)
     # get_gaussian_data([1, 2, 4], 0.5, 500)
     # get_horizontal_clamps([(0,0) , (5,0), (0,2), (5,2)], 1, 0.25, 125)
-    get_moon_b([-1, 1], [0, 2])
-    # x = np.linspace(-1.0, 1.0, 100)
-    # y = np.linspace(-1.0, 1.0, 100)
-    # X, Y = np.meshgrid(x,y)
-    # F = X**2 + Y**2 - 1
-    # plt.contour(X,Y,F,[0])
-    # plt.show()
+    # get_moon_b([-1, 1], [0, 2])
+    get_letters_data()
