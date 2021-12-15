@@ -63,9 +63,9 @@ def get_moon_c(range_x_1, range_x_2, plot):
     data_x_2 = np.random.uniform(range_x_2[0], range_x_2[1], 250)
 
     data_y_1 = 1 - data_x_1 ** 2
-    data_y_1 = np.sqrt(data_y_1) + np.random.uniform(-0.4, -0.1, 250)
+    data_y_1 = np.sqrt(data_y_1) + np.random.uniform(-0.4, -0.3, 250)
     data_y_2 = 1 - (data_x_2 - 1) ** 2
-    data_y_2 = -1 * np.sqrt(data_y_2) + 0.5 + np.random.uniform(0.1, 0.4, 250)
+    data_y_2 = -1 * np.sqrt(data_y_2) + 0.5 + np.random.uniform(0.3, 0.4, 250)
 
     if plot:
         plt.scatter(data_x_1, data_y_1)
@@ -142,13 +142,60 @@ def get_horizontal_clamps(centers, std_x, std_y, num_of_points, plot):
         return data
 
 
-def run_KMean(data, k, random_state, type_of_data, algorithm='auto'):
+def run_KMean(data, k, random_state, type_of_data, show=True, save=False,  algorithm='auto'):
     kmeans = KMeans(n_clusters=k, random_state=random_state, algorithm=algorithm).fit_predict(data)
     plt.title(f'{type_of_data} clustering, k = {k} ,algorithm = {algorithm}')
     plt.scatter(data[:, 0], data[:, 1], c=kmeans)
-    plt.savefig(f'figures/{type_of_data}_cluster_k-{k}',bbox_inches='tight')
-    plt.show()
-    return f'figures/{type_of_data}_cluster_k-{k}'
+    if save:
+        plt.savefig(f'clusters/{type_of_data}_cluster_k-{k}', bbox_inches='tight')
+    if show:
+        plt.show()
+    return f'clusters/{type_of_data}_cluster_k-{k}.png'
+
+
+def plot_synthetic_data(data, type_of_data, filename, save=False, show=True):
+    plt.title(f'{type_of_data} - raw data')
+    plt.scatter(data[:, 0], data[:, 1], c=['#000000'])
+    if save:
+        plt.savefig(f'figures/{filename}.png', bbox_inches='tight')
+    if show:
+        plt.show()
+    plt.clf()
+    return f'figures/{filename}.png'
+
+
+def run_problem_3():
+    output_dic = {'uniform_data': list(), 'gaussian_data': list(), 'clumps': list(), 'names_letters': list(),
+                  'moon_b': list(), 'moon_c': list()}
+    for i in range(2):
+        uniform_data = get_uniform_data(500, plot=False)
+        output_dic['uniform_data'].append(
+            {'path': plot_synthetic_data(uniform_data, f'Uniform data {i}', f'uniform{i}', save=True,
+                                         show=False), 'data': uniform_data})
+        centers = [1, 2, 4]
+        gaussian_data = get_gaussian_data(centers, 0.5, 500, plot=False)
+        for j in range(len(gaussian_data)):
+            output_dic['gaussian_data'].append(
+                {'path': plot_synthetic_data(gaussian_data[i], f'gaussian data {i}.{j}, center : {centers[j]}',
+                                             f'gaussian{i}.{j}', save=True, show=False),
+                 'data': gaussian_data[i]})
+        names_data = get_letters_data(plot=False)
+        output_dic['names_letters'].append(
+            {'path': plot_synthetic_data(names_data, f'Last Names first letters data {i}', f'letters{i}',
+                                         save=True, show=False), 'data': names_data})
+        clumps_data = get_horizontal_clamps([(0, 0), (5, 0), (0, 2), (5, 2)], 1, 0.25, 125, plot=False)
+        output_dic['clumps'].append(
+            {'path': plot_synthetic_data(clumps_data, f'Four horizontal clumps data {i}', f'clumps{i}',
+                                         save=True, show=False), 'data': clumps_data})
+        moon_b = get_moon_b([-1, 1], [0, 2], plot=False)
+        output_dic['moon_b'].append(
+            {'path': plot_synthetic_data(moon_b, f'Unconnected Moons  {i}', f'moon_b_{i}',
+                                         save=True, show=False), 'data': moon_b})
+        moon_c = get_moon_c([-1, 1], [0, 2], plot=False)
+        output_dic['moon_c'].append(
+            {'path': plot_synthetic_data(moon_c, f'Connected Moons  {i}', f'moon_c_{i}',
+                                         save=True, show=False), 'data': moon_c})
+    return output_dic
 
 
 def merge_x_y(x_data, y_data):
@@ -158,18 +205,17 @@ def merge_x_y(x_data, y_data):
     return np.array(data)
 
 
-
-
 if __name__ == '__main__':
     # run_KMean(get_uniform_data(500, plot=False), 4, 170)
     # run_KMean(get_gaussian_data([1, 2, 4], 0.5, 500, plot=False)[2], 4, 170)
     # run_KMean(get_horizontal_clamps([(0,0) , (5,0), (0,2), (5,2)], 1, 0.25, 125, False), 5, 170)
-    # run_KMean(get_moon_b([-1, 1], [0, 2], False),  2, 170)
+    # run_KMean(get_moon_b([-1, 1], [0, 2], False),  2, 170, 'moon', algorithm='elkan')
     # run_KMean(get_moon_c([-1, 1], [0, 2], False),  2, 170)
-    run_KMean(get_letters_data(False), 3, 170, 'letters distribution')
+
+    # run_KMean(get_letters_data(False), 3, 170, 'letters distribution')
     # x, y = get_uniform_data(500, True)
     # plot_data(x, y)
     # get_gaussian_data([1, 2, 4], 0.5, 500)
     # get_horizontal_clamps([(0,0) , (5,0), (0,2), (5,2)], 1, 0.25, 125)
     # get_moon_b([-1, 1], [0, 2])
-    # get_letters_data()
+    print(run_problem_3())
