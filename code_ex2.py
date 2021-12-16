@@ -22,14 +22,18 @@ def get_uniform_data(num_of_points, plot):
 
 
 def get_gaussian_data(centers, std, num_of_points, plot):
-    data = np.array(list())
     data_x = np.array(list())
     data_y = np.array(list())
+    first = True
     for center in centers:
         data_x = np.concatenate([data_x, np.random.normal(center, std * center, num_of_points)])
         data_y = np.concatenate([data_y, np.random.normal(-center, std * center, num_of_points)])
         temp_data = merge_x_y(data_x.tolist(), data_y.tolist())
-        np.concatenate([data, temp_data])
+        if first:
+            data = temp_data[:]
+            first = False
+        else:
+            data = np.concatenate([data, temp_data])
     if plot:
         plt.scatter(data_x, data_y)
         plt.show()
@@ -177,7 +181,7 @@ def run_problem_3():
         centers = [1, 2, 4]
         gaussian_data = get_gaussian_data(centers, 0.5, 500, plot=False)
         output_dic['gaussian_data'].append(
-                {'path': plot_synthetic_data(gaussian_data[i], f'gaussian data {i}, centers : {centers}',
+                {'path': plot_synthetic_data(gaussian_data, f'gaussian data {i}, centers : {centers}',
                                              f'gaussian{i}', save=True, show=False), 'data': gaussian_data[i]})
         names_data = get_letters_data(plot=False)
         output_dic['names_letters'].append(
@@ -234,5 +238,5 @@ if __name__ == '__main__':
     # get_gaussian_data([1, 2, 4], 0.5, 500)
     # get_horizontal_clamps([(0,0) , (5,0), (0,2), (5,2)], 1, 0.25, 125)
     # get_moon_b([-1, 1], [0, 2])
-    # print(run_problem_3())
-    hierarchical_clustering(get_moon_b([-1, 1], [0, 2], False), 'moon')
+    print(run_problem_3())
+    # hierarchical_clustering(get_moon_b([-1, 1], [0, 2], False), 'moon')
