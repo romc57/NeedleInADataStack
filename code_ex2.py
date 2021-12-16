@@ -22,16 +22,17 @@ def get_uniform_data(num_of_points, plot):
 
 
 def get_gaussian_data(centers, std, num_of_points, plot):
-    data = list()
+    data = np.array(list())
+    data_x = np.array(list())
+    data_y = np.array(list())
     for center in centers:
-        data_x = np.random.normal(center, std * center, num_of_points)
-        data_y = np.random.normal(-center, std * center, num_of_points)
+        data_x = np.concatenate([data_x, np.random.normal(center, std * center, num_of_points)])
+        data_y = np.concatenate([data_y, np.random.normal(-center, std * center, num_of_points)])
         temp_data = merge_x_y(data_x.tolist(), data_y.tolist())
-        if plot:
-            plt.scatter(data_x, data_y)
-            plt.show()
-        data.append(temp_data)
-    data = np.array(data)
+        np.concatenate([data, temp_data])
+    if plot:
+        plt.scatter(data_x, data_y)
+        plt.show()
     return data
 
 
