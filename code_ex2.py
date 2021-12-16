@@ -176,11 +176,9 @@ def run_problem_3():
                                          show=False), 'data': uniform_data})
         centers = [1, 2, 4]
         gaussian_data = get_gaussian_data(centers, 0.5, 500, plot=False)
-        for j in range(len(gaussian_data)):
-            output_dic['gaussian_data'].append(
-                {'path': plot_synthetic_data(gaussian_data[i], f'gaussian data {i}.{j}, center : {centers[j]}',
-                                             f'gaussian{i}.{j}', save=True, show=False),
-                 'data': gaussian_data[i]})
+        output_dic['gaussian_data'].append(
+                {'path': plot_synthetic_data(gaussian_data[i], f'gaussian data {i}, centers : {centers}',
+                                             f'gaussian{i}', save=True, show=False), 'data': gaussian_data[i]})
         names_data = get_letters_data(plot=False)
         output_dic['names_letters'].append(
             {'path': plot_synthetic_data(names_data, f'Last Names first letters data {i}', f'letters{i}',
