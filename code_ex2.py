@@ -1,10 +1,7 @@
-import itertools
-
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
-
 
 MIN_RANGE = 0
 MAX_RANGE = 1
@@ -148,7 +145,7 @@ def get_horizontal_clamps(centers, std_x, std_y, num_of_points, plot):
         return data
 
 
-def run_KMean(data, k, random_state, type_of_data, show=True, save=False,  algorithm='auto'):
+def run_KMean(data, k, random_state, type_of_data, show=True, save=False, algorithm='auto'):
     kmeans = KMeans(n_clusters=k, random_state=random_state, algorithm=algorithm).fit_predict(data)
     plt.title(f'{type_of_data} clustering, k = {k} ,algorithm = {algorithm}')
     plt.scatter(data[:, 0], data[:, 1], c=kmeans)
@@ -181,8 +178,8 @@ def run_problem_3():
         centers = [1, 2, 4]
         gaussian_data = get_gaussian_data(centers, 0.5, 500, plot=False)
         output_dic['gaussian_data'].append(
-                {'path': plot_synthetic_data(gaussian_data, f'gaussian data {i}, centers : {centers}',
-                                             f'gaussian{i}', save=True, show=False), 'data': gaussian_data[i]})
+            {'path': plot_synthetic_data(gaussian_data, f'gaussian data {i}, centers : {centers}',
+                                         f'gaussian{i}', save=True, show=False), 'data': gaussian_data[i]})
         names_data = get_letters_data(plot=False)
         output_dic['names_letters'].append(
             {'path': plot_synthetic_data(names_data, f'Last Names first letters data {i}', f'letters{i}',
@@ -215,7 +212,6 @@ def hierarchical_clustering(data, type_of_data, save=False, show=True):
                 plt.show()
             figures.append(f'clusters/{type_of_data}_cluster_k-{k}.png')
     return figures
-
 
 
 def merge_x_y(x_data, y_data):
