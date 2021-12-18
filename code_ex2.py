@@ -324,6 +324,6 @@ def run_assignment(create_clusters_flag, create_pdf_flag):
 
 
 if __name__ == '__main__':
-    run_assignment(False, True)
+    run_assignment(True, True)
 
 
