@@ -319,7 +319,7 @@ def run_assignment(create_clusters_flag, create_pdf_flag):
     if create_pdf_flag:
         with open('figure_to_cluster.json', 'r') as reader:
             input_j = json.loads(reader.read())
-        participants = [{'name': 'Rom Cohen', 'id': '12345667'}, {'name': 'Roi', 'id': '123456789'}]
+        participants = [{'name': 'Rom Cohen', 'id': '123456789'}, {'name': 'Roy Schossberger', 'id': '123456789'}]
         create_pdf(input_j, participants)
 
 
