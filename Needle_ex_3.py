@@ -37,10 +37,10 @@ def count_tokens(doc, stop_words_out):
     return token_count
 
 
-def count_stemmed_token(doc, stop_words_out):
+def count_stemmed_token(doc, punct_out):
     token_count = dict()
     for token in doc:
-        if stop_words_out and (token.is_stop or token.is_space or token.is_punct):
+        if punct_out and (token.is_space or token.is_punct):
             continue
         if token.lemma_ not in token_count:
             token_count[token.lemma_] = 1
@@ -60,7 +60,6 @@ def find_pos(doc):
 
 
 def extract_adj_nouns_phrases(doc):
-    # Todo: check forum for assumptions.
     adj_nouns_lst = create_by_order_lst(doc, [ADJ, NOUN, PROPN, PRON])
     adj_nouns_phrases = list()
     i = 0
@@ -72,13 +71,15 @@ def extract_adj_nouns_phrases(doc):
             i += 1
             if i < len(adj_nouns_lst):
                 word, pos = adj_nouns_lst[i]
-            else: break
+            else:
+                break
         while pos == NOUN or pos == PROPN or pos == PRON:
             curr_lst.append(word)
             i += 1
             if i < len(adj_nouns_lst):
                 word, pos = adj_nouns_lst[i]
-            else: break
+            else:
+                break
         curr_phrase = " ".join(curr_lst)
         adj_nouns_phrases.append(curr_phrase)
     return adj_nouns_phrases
@@ -86,11 +87,54 @@ def extract_adj_nouns_phrases(doc):
 
 def create_by_order_lst(doc, pos_lst):
     lst_pos = list()
-    for i in range(len(doc)):
-        token = doc[i]
+    for token in doc:
         if token.pos_ in pos_lst and not token.is_stop:
             lst_pos.append((token.text, token.pos_))
     return lst_pos
+
+
+def adj_nouns_in_order(doc):
+    lst_pos = list()
+    i = 0
+    while i < (len(doc)):
+        token = doc[i]
+        while token.pos_ == ADJ:
+            lst_pos.append((token.text, i))
+            i += 1
+            if i < len(doc):
+                token = doc[i]
+            else:
+                break
+            while token.pos_ == PROPN or token.pos_ == NOUN or token.pos_ == PRON:
+                lst_pos.append((token.text, i))
+                i += 1
+                if i < len(doc):
+                    token = doc[i]
+                else:
+                    break
+        i += 1
+    return create_sequences(lst_pos)
+
+
+def create_sequences(lst_pos):
+    output = list()
+    i = 0
+    while i < len(lst_pos) - 1:
+        word, index = lst_pos[i]
+        word_2, index_2 = lst_pos[i + 1]
+        curr_seq = [word]
+        while index_2 - index == 1:
+            curr_seq.append(word_2)
+            i += 1
+            if i < len(lst_pos) - 1:
+                word, index = lst_pos[i]
+                word_2, index_2 = lst_pos[i + 1]
+            else:
+                break
+        i += 1
+        if len(curr_seq) > 1:
+            output.append(curr_seq)
+    return output
 
 
 def get_top_twenty(dictionary):
@@ -110,8 +154,8 @@ def plot_counts(sorted_dictionary, graph_name):
     fig, ax = plt.subplots()
     ax.bar(x_axis, values)
     plt.title(graph_name)
-    ax.set_ylabel('Log Count')
-    ax.set_xlabel('Rank')
+    ax.set_ylabel('Log Frequency')
+    ax.set_xlabel('Log Rank')
     ax.set_yscale('log')
     ax.set_xscale('log')
     plt.show()
@@ -120,6 +164,7 @@ def plot_counts(sorted_dictionary, graph_name):
 def phrases_count(phrases):
     token_count = dict()
     for token in phrases:
+        token = tuple(token)
         if token not in token_count:
             token_count[token] = 1
         else:
@@ -146,52 +191,63 @@ def get_nouns_lst(doc):
 
 
 def word_cloud_plot(word_lst):
-    comment_words = " ".join(word_lst)+" "
+    comment_words = " ".join(word_lst) + " "
     stopwords = set(STOPWORDS)
-    word_cloud = WordCloud(width = 800, height = 800,
-                      background_color ='white',
-                      stopwords = stopwords,
-                      min_font_size = 10).generate(comment_words)
+    word_cloud = WordCloud(width=800, height=800,
+                           background_color='white',
+                           stopwords=stopwords,
+                           min_font_size=10).generate(comment_words)
 
-    plt.figure(figsize = (8, 8), facecolor = None)
+    plt.figure(figsize=(8, 8), facecolor=None)
     plt.imshow(word_cloud)
     plt.axis("off")
-    plt.tight_layout(pad = 0)
+    plt.tight_layout(pad=0)
     plt.show()
 
 
 def find_duplicates_word(text):
-    founds = re.findall(r'\b(\w+)( *\,* *\.* *)\1\b', text)
-    duplicate_words = np.array(founds)[:, 0]
+    duplicate_words = list()
+    founds = re.findall(r'\b(\w+)( *\,* +\.* *)\1\b', text)
+    for found, sep in founds:
+        duplicate_words.append(found + sep + found)
     return duplicate_words
 
 
 def run_all(file_path, nlp_model):
     book_txt = text_from_file(file_path)
     analyzed_book = nlp_model(book_txt)
+    # task b)
     count_token_dictionary = count_tokens(analyzed_book.doc, False)
     top_twenty, sorted_count_token = get_top_twenty(count_token_dictionary)
     plot_counts(sorted_count_token, '(b) Full Tokens')
     print(top_twenty)
+    # # task c)
     count_token_dictionary_no_stops = count_tokens(analyzed_book.doc, True)
     top_twenty_no_stop, sorted_count_token_no_stop = get_top_twenty(count_token_dictionary_no_stops)
     plot_counts(sorted_count_token_no_stop, '(c) No Stops')
     print(top_twenty_no_stop)
+    # # task d)
     count_token_dictionary_lemma = count_stemmed_token(analyzed_book.doc, True)
     top_twenty_stemmed, sorted_count_lemma = get_top_twenty(count_token_dictionary_lemma)
-    plot_counts(sorted_count_token_no_stop, '(d) Stemmed')
+    plot_counts(sorted_count_lemma, '(d) Stemmed')
     print(top_twenty_stemmed)
-    adj_noun_phrases = extract_adj_nouns_phrases(analyzed_book.doc)
+    # task e)
+    adj_noun_phrases = adj_nouns_in_order(analyzed_book.doc)
     count_phrase = phrases_count(adj_noun_phrases)
     top_twenty_phrases, sorted_phrases_dic = get_top_twenty(count_phrase)
+    plot_counts(sorted_phrases_dic, '(e) adj + noun phrases')
     print(top_twenty_phrases)
-    # TODO : count tokens of adj_noun_phrases
+    # task g)
     pos_dictionary = find_pos(analyzed_book.doc)
     top_10, down_10 = get_pos_homographs(pos_dictionary)
-    print(top_10, down_10)
+    print(top_10)
+    print(down_10)
+    # task h
     nouns = get_nouns_lst(analyzed_book.doc)
     word_cloud_plot(nouns)
+    # task i)
     duplicates = find_duplicates_word(book_txt)
+    print(duplicates)
 
 
 if __name__ == '__main__':
